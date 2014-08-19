@@ -469,6 +469,10 @@ class Group(object):
     def handle_fonttbl(self):
         self.specialMeaning = 'FONT_TABLE'
         self.charsetTable = {}
+        
+    # def handle_colortbl(self):
+        # self.specialMeaning = 'COLOR_LIST'
+        # self.colorList = []
 
 
     def _setFontCharset(self, charset=None):
@@ -506,7 +510,24 @@ class Group(object):
                 raise ValueError("Unsupported charset %s" % charsetNum)
             self._setFontCharset(charset)
 
-
+    # def handle_red(self, val):
+        # if 'COLOR_LIST' in (self.parent.specialMeaning, self.specialMeaning):
+            # self.content.append(ReadableMarker("red", val))
+        # else:
+            # raise KeyError("Found \\red where it doesn't belong")
+    
+    # def handle_green(self, val):
+        # if 'COLOR_LIST' in (self.parent.specialMeaning, self.specialMeaning):
+            # self.content.append(ReadableMarker("green", val))
+        # else:
+            # raise KeyError("Found \\green where it doesn't belong")
+    
+    # def handle_blue(self, val):
+        # if 'COLOR_LIST' in (self.parent.specialMeaning, self.specialMeaning):
+            # self.content.append(ReadableMarker("blue", val))
+        # else:
+            # raise KeyError("Found \\blue where it doesn't belong")
+    
     def handle_ansi_escape(self, code):
         code = int(code, 16)
 
@@ -543,6 +564,14 @@ class Group(object):
         self.content.append(Skip(self.props.get('unicode_skip', 1)))
 
 
+    def handle_cf(self, colourIndex):
+        self.content.append(ReadableMarker("textColour", colourIndex))
+    
+    def handle_highlight(self, colourIndex):
+        colours = ["black", "blue", "cyan", "green", "magenta", "red", "yellow", "unused", "dark blue", "dark cyan", 
+                   "dark green", "dark magenta", "dark red", "dark yellow", "dark gray", "light gray"]
+        self.content.append(ReadableMarker("highlight", colours[int(colourIndex)-1]))
+        
     def handle_par(self):
         p = Para()
         self.content.append(p)
@@ -601,6 +630,9 @@ class Group(object):
 
     def handle_sub(self):
         self.content.append(ReadableMarker("sub", True))
+
+    def handle_shading(self, colour):
+        self.content.append(ReadableMarker("shading", colour))
 
     def handle_emdash(self):
         self.content.append(u'\u2014')

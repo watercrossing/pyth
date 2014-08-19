@@ -58,6 +58,11 @@ class _PythBase(object):
 
         self.content.append(item)
 
+    def __repr__(self):
+        return "%s([%s], %s)" % (self.__class__.__name__,", ".join(repr(r) for r in self.content), self.properties)
+
+    def __str__(self):
+        return "%s(%s):\n%s" %(self.__class__.__name__, self.properties, "\n".join("   %s" %s for r in self.content for s in str(r).splitlines()))
 
 class Text(_PythBase):
     """
@@ -69,12 +74,12 @@ class Text(_PythBase):
     They do not inherit their properties from anything.
     """
 
-    validProperties = ('bold', 'italic', 'underline', 'url', 'sub', 'super')
+    validProperties = ('bold', 'italic', 'underline', 'url', 'sub', 'super', 'shading', 'textColour', 'highlight' )
     contentType = unicode
 
-    def __repr__(self):
-        return "Text('%s' %s)" % ("".join("[%s]" % r.encode("utf-8") for r in self.content), self.properties)
-
+    def __str__(self):
+        return "%s(%s):\n%s" %(self.__class__.__name__, self.properties, "\n".join("   %s" %r.encode("utf-8") for r in self.content))
+    
 
 class Paragraph(_PythBase):
     """
@@ -103,7 +108,8 @@ class Image(Paragraph):
 
     def __repr__(self):
         return "Image(%d bytes, %s)" %(len(self.content[0])/2,self.properties)
-
+    
+    __str__ = __repr__
 
 class ListEntry(_PythBase):
     """
